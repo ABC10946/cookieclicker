@@ -2,6 +2,12 @@ cookieCount = 0
 cursorCount = 0
 grandmaCount = 0
 
+const cursorBasePrice = 15
+const grandmaBasePrice = 100
+
+cursorPrice = 15
+grandmaPrice = 100
+
 window.onload = function() {
     cookie = document.getElementById('cookie')
     cookie.addEventListener('click', cookieClick)
@@ -12,12 +18,20 @@ window.onload = function() {
 
     addGrandmaBtn = document.getElementById('add_grandma')
     addGrandmaBtn.addEventListener('click', addGrandma)
+    
+    totalCpsLabel = document.getElementById('total_cps')
 
     setInterval(function() {
-        cookieCount = cookieCount + (0.0001 * cursorCount) + (0.001 * grandmaCount)
+        cookieCount = cookieCount + computeTotalCps(cursorCount, grandmaCount)/1000
+        totalCpsLabel.innerText = computeTotalCps(cursorCount, grandmaCount)
         setCookieCounterLabel(cookieCount)
         checkBtnEnable()
     }, 1)
+
+    setInterval(function() {
+        saveData()
+        console.log('data saved')
+    }, 60000)
 }
 
 function cookieClick() {
@@ -46,15 +60,19 @@ function loadData() {
     cookieCount = parseInt(cookieCountStr)
     cursorCount = parseInt(cursorCountStr)
     grandmaCount = parseInt(grandmaCountStr)
+    cursorPrice = computePrice(cursorBasePrice, cursorCount)
+    grandmaPrice = computePrice(grandmaBasePrice, grandmaCount)
     console.log('restore cookie count is:' + String(cookieCount))
     setCookieCounterLabel(cookieCount)
     setCursorCounterLabel(cursorCount)
     setGrandmaCounterLabel(grandmaCount)
+    setCursorPriceLabel(cursorPrice)
+    setGrandmaPriceLabel(grandmaPrice)
 }
 
 function setCookieCounterLabel(value) {
     cookieCounter = document.getElementById('cookie_counter')
-    cookieCounter.innerText = value
+    cookieCounter.innerText = Math.trunc(value)
 }
 
 function setCursorCounterLabel(value) {
@@ -67,32 +85,54 @@ function setGrandmaCounterLabel(value) {
     grandmaCounter.innerText = value
 }
 
+function setCursorPriceLabel(value) {
+    cursorPriceLabel = document.getElementById('cursor_price')
+    cursorPriceLabel.innerText = value
+}
+
+function setGrandmaPriceLabel(value) {
+    grandmaPriceLabel = document.getElementById('grandma_price')
+    grandmaPriceLabel.innerText = value
+}
+
 function addCursor() {
-    cookieCount = cookieCount - 15
+    cookieCount = cookieCount - cursorPrice
     cursorCount = cursorCount + 1
+    cursorPrice = computePrice(cursorBasePrice, cursorCount)
     setCookieCounterLabel(cookieCount)
     setCursorCounterLabel(cursorCount)
+    setCursorPriceLabel(cursorPrice)
 }
 
 function addGrandma() {
-    cookieCount = cookieCount - 100
+    cookieCount = cookieCount - grandmaPrice
     grandmaCount = grandmaCount + 1
+    grandmaPrice = computePrice(grandmaBasePrice, grandmaCount)
     setCookieCounterLabel(cookieCount)
     setGrandmaCounterLabel(grandmaCount)
+    setGrandmaPriceLabel(grandmaPrice)
 }
 
 function checkBtnEnable() {
     addCursorBtn = document.getElementById('add_cursor')
     addGrandmaCursorBtn = document.getElementById('add_grandma')
-    if (cookieCount >= 15) {
+    if (cookieCount >= cursorPrice) {
         addCursorBtn.disabled = false
     } else {
         addCursorBtn.disabled = true
     }
 
-    if (cookieCount >= 100) {
+    if (cookieCount >= grandmaPrice) {
         addGrandmaCursorBtn.disabled = false
     } else {
         addGrandmaCursorBtn.disabled = true
     }
+}
+
+function computePrice(basePrice, count) {
+    return basePrice * Math.pow(1.15, count)
+}
+
+function computeTotalCps(cursorCount, grandmaCount) {
+    return (0.1 * cursorCount) + (1 * grandmaCount)
 }
