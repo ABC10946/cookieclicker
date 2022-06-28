@@ -16,7 +16,10 @@ minePrice = 12000
 
 window.onload = function() {
     cookie = document.getElementById('cookie')
+    cookie.style.backgroundColor = 'white'
+    cookie.addEventListener('mousedown', cookieDown)
     cookie.addEventListener('click', cookieClick)
+    cookie.addEventListener('mouseup', cookieUp)
     loadData()
 
     addCursorBtn = document.getElementById('add_cursor')
@@ -46,13 +49,41 @@ window.onload = function() {
     }, 60000)
 }
 
+function cookieDown() {
+    cookie.animate(
+        [
+            {backgroundColor: 'white'},
+            {backgroundColor: 'gray'}
+        ],
+        {
+            duration: 250,
+            fill: 'forwards'
+        }
+    )
+}
+
 function cookieClick() {
     console.log('cookie clicked!')
     cookieCount = cookieCount + 1
     checkBtnEnable()
     setCookieCounterLabel(cookieCount)
+
     saveData()
 }
+
+function cookieUp() {
+    cookie.animate(
+        [
+            {backgroundColor: 'gray'},
+            {backgroundColor: 'white'}
+        ],
+        {
+            duration: 250,
+            fill: 'forwards'
+        }
+    )
+}
+
 
 function saveData() {
     localStorage.setItem('cookie', String(cookieCount))
@@ -139,7 +170,7 @@ function setFarmPriceLabel(value) {
 
 function setMinePriceLabel(value) {
     minePriceLabel = document.getElementById('mine_price')
-    minePrice.innerText = Math.trunc(value)
+    minePriceLabel.innerText = Math.trunc(value)
 }
 
 function addCursor() {
